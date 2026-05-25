@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Erbilen'in Web Sitesi</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background-color: #f4f4f9; }
+        h1 { color: #333; }
+        form { margin-top: 20px; }
+        input, textarea, button { padding: 10px; margin: 5px; width: 300px; border-radius: 5px; border: 1px solid #ccc; }
+        button { background-color: #28a745; color: white; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <h1>Merhaba, Erbilen'in Web Sitesine Hoş Geldiniz!</h1>
+    <p>Bu site HTML ile kodlandı ve dünyanın en hızlı sunucularında barındırılıyor.</p>
+
+    <form name="iletisim" method="POST" data-netlify="true">
+        <input type="text" name="isim" placeholder="Adınız" required><br>
+        <input type="email" name="email" placeholder="E-posta Adresiniz" required><br>
+        <textarea name="mesaj" placeholder="Mesajınız..." rows="4" required></textarea><br>
+        <button type="submit">Mesaj Gönder</button>
+    </form>
+
+</body>
+</html>
