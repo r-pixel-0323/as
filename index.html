@@ -1,27 +1,1324 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <title>Erbilen's Web Sitesi</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background-color: #f4f4f9; }
-        h1 { color: #333; }
-        form { margin-top: 20px; }
-        input, textarea, button { padding: 10px; margin: 5px; width: 300px; border-radius: 5px; border: 1px solid #ccc; }
-        button { background-color: #28a745; color: white; cursor: pointer; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Erbilenin Sitesi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;500;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080810;
+    --bg2: #0f0f1e;
+    --bg3: #16162a;
+    --accent: #c8f04a;
+    --accent2: #7b4fff;
+    --accent3: #ff4f7b;
+    --text: #eeeef5;
+    --muted: #888899;
+    --border: rgba(200,240,74,0.18);
+    --glow: 0 0 24px rgba(200,240,74,0.22);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  #cursor {
+    position: fixed; z-index: 9999; pointer-events: none;
+    width: 18px; height: 18px;
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    transform: translate(-50%,-50%);
+    transition: transform 0.08s, background 0.15s, width 0.2s, height 0.2s;
+    mix-blend-mode: difference;
+  }
+  #cursor.hovered { width: 36px; height: 36px; background: rgba(200,240,74,0.15); }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.5;
+  }
+
+  /* SCROLL BAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+  /* ═══════════════════════════════════ NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 4rem;
+    background: rgba(8,8,16,0.7);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem; letter-spacing: 0.1em;
+    color: var(--accent);
+    text-shadow: var(--glow);
+  }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem; text-decoration: none;
+    color: var(--muted); letter-spacing: 0.08em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 4px 10px; border-radius: 20px;
+  }
+
+  /* ═══════════════════════════════════ HERO */
+  #hero {
+    min-height: 100vh;
+    display: grid; place-items: center;
+    position: relative; padding: 8rem 4rem 4rem;
+    overflow: hidden;
+  }
+  .hero-grid-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(200,240,74,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,240,74,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent);
+  }
+  .hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    animation: float 8s ease-in-out infinite;
+  }
+  .orb1 { width: 400px; height: 400px; background: rgba(123,79,255,0.2); top: 10%; left: -5%; animation-delay: 0s; }
+  .orb2 { width: 300px; height: 300px; background: rgba(200,240,74,0.12); top: 60%; right: -2%; animation-delay: -3s; }
+  .orb3 { width: 250px; height: 250px; background: rgba(255,79,123,0.15); bottom: 5%; left: 30%; animation-delay: -5s; }
+  @keyframes float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-30px) scale(1.05); }
+  }
+  .hero-content { position: relative; z-index: 1; text-align: center; max-width: 900px; }
+  .hero-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem; color: var(--accent);
+    border: 1px solid rgba(200,240,74,0.3);
+    padding: 5px 14px; border-radius: 20px;
+    margin-bottom: 2rem;
+    animation: fadeUp 0.8s ease both;
+  }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4rem, 10vw, 9rem);
+    line-height: 0.95; letter-spacing: 0.03em;
+    animation: fadeUp 0.8s ease 0.1s both;
+  }
+  .hero-title .line-accent { color: var(--accent); text-shadow: var(--glow); }
+  .hero-title .line-dim { color: var(--muted); }
+  .hero-sub {
+    margin-top: 1.5rem;
+    font-size: 1rem; color: var(--muted);
+    max-width: 560px; margin-inline: auto;
+    line-height: 1.7;
+    animation: fadeUp 0.8s ease 0.2s both;
+  }
+  .hero-btns {
+    margin-top: 2.5rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+    animation: fadeUp 0.8s ease 0.3s both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 0.75rem 1.8rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem; letter-spacing: 0.05em;
+    text-decoration: none; border: none;
+    border-radius: 4px; cursor: none;
+    transition: all 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .btn::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: white;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .btn:hover::after { opacity: 0.07; }
+  .btn-primary { background: var(--accent); color: #080810; font-weight: 700; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(200,240,74,0.3); }
+  .btn-outline { background: transparent; color: var(--text); border: 1px solid rgba(255,255,255,0.2); }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-danger { background: var(--accent3); color: white; }
+  .btn-purple { background: var(--accent2); color: white; }
+
+  /* ═══════════════════════════════════ SECTIONS */
+  section { padding: 6rem 4rem; position: relative; z-index: 1; }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; color: var(--accent); letter-spacing: 0.15em;
+    text-transform: uppercase; margin-bottom: 0.5rem;
+  }
+  h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    letter-spacing: 0.04em; margin-bottom: 3rem;
+    line-height: 1;
+  }
+  h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem; font-weight: 700;
+    color: var(--text); margin-bottom: 1rem;
+  }
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .card:hover { border-color: rgba(200,240,74,0.4); transform: translateY(-3px); }
+
+  /* GRID LAYOUTS */
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; }
+  .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+
+  /* ═══════════════════════════════════ TYPOGRAPHY */
+  #typography { background: var(--bg2); }
+  .type-showcase > * + * { margin-top: 1.2rem; }
+  .t-h1 { font-family: 'Bebas Neue'; font-size: 3.5rem; color: var(--accent); letter-spacing: 0.04em; }
+  .t-h2 { font-family: 'Syne'; font-size: 2rem; font-weight: 800; }
+  .t-h3 { font-family: 'Syne'; font-size: 1.4rem; font-weight: 700; }
+  .t-h4 { font-family: 'Syne'; font-size: 1.1rem; font-weight: 700; color: var(--muted); }
+  .t-lead { font-size: 1.15rem; line-height: 1.8; color: var(--muted); max-width: 600px; }
+  .t-mono { font-family: 'JetBrains Mono'; font-size: 0.9rem; color: var(--accent2); }
+  .t-small { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.05em; }
+  mark { background: rgba(200,240,74,0.25); color: var(--accent); padding: 1px 4px; border-radius: 3px; }
+  code { font-family: 'JetBrains Mono'; font-size: 0.85em; background: var(--bg3); padding: 2px 7px; border-radius: 4px; color: var(--accent3); }
+  kbd { font-family: 'JetBrains Mono'; font-size: 0.78em; background: var(--bg3); border: 1px solid rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 4px; }
+  abbr { text-decoration: underline dotted; cursor: help; }
+  blockquote {
+    border-left: 3px solid var(--accent);
+    padding-left: 1.5rem; margin: 1rem 0;
+    font-style: italic; color: var(--muted);
+  }
+  details {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+  summary {
+    cursor: none; font-weight: 700; color: var(--accent);
+    list-style: none; display: flex; justify-content: space-between; align-items: center;
+  }
+  summary::after { content: '+'; color: var(--muted); font-size: 1.2rem; transition: transform 0.2s; }
+  details[open] summary::after { content: '−'; }
+
+  /* ═══════════════════════════════════ FORM */
+  #form-section { background: var(--bg); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+  label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; color: var(--muted); letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  input[type="text"], input[type="email"], input[type="password"],
+  input[type="number"], input[type="date"], input[type="url"],
+  input[type="tel"], input[type="search"], input[type="time"],
+  input[type="month"], input[type="week"], input[type="datetime-local"],
+  select, textarea {
+    background: var(--bg3);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    color: var(--text);
+    padding: 0.65rem 1rem;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    width: 100%;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(200,240,74,0.1);
+  }
+  select { cursor: none; }
+  textarea { resize: vertical; min-height: 100px; }
+  input[type="color"] {
+    width: 100%; height: 40px; padding: 2px 4px;
+    background: var(--bg3); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px; cursor: none;
+  }
+  input[type="range"] {
+    width: 100%; accent-color: var(--accent); cursor: none;
+    height: 6px;
+  }
+  input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); cursor: none; width: 16px; height: 16px; }
+  .radio-group, .check-group { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .radio-item, .check-item { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: none; }
+  .field-row { display: flex; align-items: center; gap: 12px; }
+  progress { width: 100%; height: 6px; border-radius: 3px; accent-color: var(--accent); }
+  meter { width: 100%; height: 6px; }
+  .input-note { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+  fieldset {
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 1.5rem;
+  }
+  legend {
+    font-family: 'JetBrains Mono'; font-size: 0.75rem;
+    color: var(--accent); letter-spacing: 0.1em;
+    padding: 0 8px;
+  }
+  datalist { display: none; }
+
+  /* ═══════════════════════════════════ TABLE */
+  #table-section { background: var(--bg2); }
+  .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; }
+  thead { background: var(--bg3); }
+  th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--accent); padding: 1rem 1.25rem; text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td { padding: 0.9rem 1.25rem; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  tbody tr { transition: background 0.15s; }
+  tbody tr:hover { background: rgba(200,240,74,0.04); }
+  .badge {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-family: 'JetBrains Mono'; font-size: 0.7rem; letter-spacing: 0.05em;
+  }
+  .badge-green { background: rgba(200,240,74,0.12); color: var(--accent); }
+  .badge-purple { background: rgba(123,79,255,0.15); color: #a888ff; }
+  .badge-red { background: rgba(255,79,123,0.15); color: var(--accent3); }
+  .badge-muted { background: rgba(255,255,255,0.06); color: var(--muted); }
+
+  /* ═══════════════════════════════════ MEDIA */
+  #media-section { background: var(--bg); }
+  .canvas-wrap { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  canvas { display: block; width: 100%; }
+  video, audio { width: 100%; border-radius: 8px; }
+  .svg-showcase { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+  figure { margin: 0; }
+  figcaption { font-size: 0.75rem; color: var(--muted); text-align: center; margin-top: 0.5rem; font-family: 'JetBrains Mono'; }
+
+  /* ═══════════════════════════════════ SEMANTIC */
+  #semantic-section { background: var(--bg2); }
+  article {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.5rem;
+  }
+  article header { margin-bottom: 0.75rem; }
+  article time { font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--muted); }
+  article footer { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+  aside {
+    background: rgba(123,79,255,0.08);
+    border: 1px solid rgba(123,79,255,0.2);
+    border-radius: 10px; padding: 1.25rem;
+  }
+  .definition-list dt {
+    font-family: 'JetBrains Mono'; font-size: 0.8rem;
+    color: var(--accent); letter-spacing: 0.06em;
+    margin-top: 1rem;
+  }
+  .definition-list dd { color: var(--muted); font-size: 0.9rem; padding-left: 1rem; border-left: 2px solid var(--border); margin-left: 0; }
+  address { font-style: normal; color: var(--muted); font-size: 0.9rem; line-height: 1.8; }
+
+  /* ═══════════════════════════════════ INTERACTIVE */
+  #interactive-section { background: var(--bg); }
+  dialog {
+    background: var(--bg2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 2rem; max-width: 480px; width: 90%;
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  dialog::backdrop { background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); }
+  dialog h3 { font-family: 'Bebas Neue'; font-size: 2rem; color: var(--accent); margin-bottom: 1rem; }
+  .counter-box {
+    display: flex; align-items: center; gap: 1rem; justify-content: center;
+    padding: 2rem; background: var(--bg3); border-radius: 12px; border: 1px solid var(--border);
+  }
+  .counter-val {
+    font-family: 'Bebas Neue'; font-size: 4rem;
+    color: var(--accent); min-width: 100px; text-align: center;
+    text-shadow: var(--glow);
+  }
+  .tabs-wrap { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .tab-btns { display: flex; background: var(--bg3); border-bottom: 1px solid var(--border); }
+  .tab-btn {
+    padding: 0.75rem 1.5rem;
+    background: none; border: none; cursor: none;
+    font-family: 'JetBrains Mono'; font-size: 0.8rem;
+    color: var(--muted); letter-spacing: 0.05em;
+    transition: all 0.2s; border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-content { padding: 1.5rem; display: none; }
+  .tab-content.active { display: block; }
+  .accordion { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .acc-item { border-bottom: 1px solid var(--border); }
+  .acc-item:last-child { border-bottom: none; }
+  .acc-btn {
+    width: 100%; text-align: left; background: var(--bg2);
+    border: none; color: var(--text); padding: 1rem 1.25rem;
+    font-family: 'Syne'; font-size: 0.9rem; font-weight: 700;
+    cursor: none; display: flex; justify-content: space-between; align-items: center;
+    transition: background 0.2s;
+  }
+  .acc-btn:hover { background: var(--bg3); }
+  .acc-arrow { transition: transform 0.2s; color: var(--accent); }
+  .acc-panel { display: none; padding: 1rem 1.25rem; color: var(--muted); font-size: 0.9rem; line-height: 1.7; }
+  .acc-panel.open { display: block; }
+  .tooltip-wrap { position: relative; display: inline-block; }
+  .tooltip {
+    display: none; position: absolute; bottom: calc(100% + 8px); left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text); font-size: 0.78rem; padding: 6px 12px;
+    border-radius: 6px; white-space: nowrap;
+    font-family: 'JetBrains Mono';
+  }
+  .tooltip-wrap:hover .tooltip { display: block; }
+  .progress-bars { display: flex; flex-direction: column; gap: 1rem; }
+  .prog-row { display: flex; flex-direction: column; gap: 4px; }
+  .prog-label { display: flex; justify-content: space-between; font-size: 0.8rem; }
+  .prog-track { height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+  .prog-fill {
+    height: 100%; border-radius: 3px;
+    animation: fillBar 1.5s ease both;
+  }
+  @keyframes fillBar { from { width: 0; } }
+  .fill-green { background: var(--accent); }
+  .fill-purple { background: var(--accent2); }
+  .fill-pink { background: var(--accent3); }
+
+  /* ═══════════════════════════════════ LISTS */
+  #list-section { background: var(--bg2); }
+  .fancy-ol { list-style: none; counter-reset: ol-counter; }
+  .fancy-ol li { counter-increment: ol-counter; display: flex; gap: 1rem; align-items: start; padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-size: 0.92rem; }
+  .fancy-ol li::before {
+    content: counter(ol-counter, decimal-leading-zero);
+    font-family: 'Bebas Neue'; font-size: 1.4rem; color: var(--accent);
+    min-width: 36px; line-height: 1.1;
+  }
+  .fancy-ul { list-style: none; }
+  .fancy-ul li { padding: 0.5rem 0; padding-left: 1.5rem; position: relative; font-size: 0.92rem; color: var(--muted); }
+  .fancy-ul li::before { content: '▸'; position: absolute; left: 0; color: var(--accent); }
+
+  /* ═══════════════════════════════════ STATS */
+  #stats-section { background: var(--bg); }
+  .stat-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 2rem;
+    display: flex; flex-direction: column; gap: 0.5rem;
+    transition: all 0.2s;
+  }
+  .stat-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(200,240,74,0.08); }
+  .stat-num {
+    font-family: 'Bebas Neue'; font-size: 3.5rem;
+    color: var(--accent); line-height: 1; text-shadow: var(--glow);
+  }
+  .stat-label { font-size: 0.8rem; color: var(--muted); font-family: 'JetBrains Mono'; letter-spacing: 0.05em; }
+  .stat-desc { font-size: 0.9rem; color: var(--text); }
+
+  /* ═══════════════════════════════════ FOOTER */
+  footer {
+    background: var(--bg2); border-top: 1px solid var(--border);
+    padding: 4rem; text-align: center;
+    position: relative;
+  }
+  footer p { color: var(--muted); font-size: 0.85rem; line-height: 1.8; }
+  .footer-logo {
+    font-family: 'Bebas Neue'; font-size: 3rem;
+    color: var(--accent); text-shadow: var(--glow);
+    margin-bottom: 1rem;
+  }
+
+  /* ═══════════════════════════════════ ANIMATIONS */
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    section { padding: 4rem 1.5rem; }
+    .form-grid { grid-template-columns: 1fr; }
+    .form-group.full { grid-column: auto; }
+  }
+</style>
 </head>
 <body>
 
-    <h1>Merhaba, Erbilen'in Web Sitesine Hoş Geldiniz!</h1>
-    <p>Bu site HTML ile kodlandı ve dünyanın en hızlı sunucularında.</p>
+<div id="cursor"></div>
 
-    <form name="iletisim" method="POST" data-netlify="true">
-        <input type="text" name="isim" placeholder="Adınız" required><br>
-        <input type="email" name="email" placeholder="E-posta Adresiniz" required><br>
-        <textarea name="mesaj" placeholder="Mesajınız..." rows="4" required></textarea><br>
-        <button type="submit">Mesaj Gönder</button>
-    </form>
+<!-- ════════════════════ NAV -->
+<nav>
+  <div class="logo">ERBİLEN</div>
+  <ul class="nav-links">
+    <li><a href="#typography">Tipografi</a></li>
+    <li><a href="#form-section">Form</a></li>
+    <li><a href="#table-section">Tablo</a></li>
+    <li><a href="#media-section">Medya</a></li>
+    <li><a href="#interactive-section">İnteraktif</a></li>
+    <li><a href="#semantic-section">Semantik</a></li>
+  </ul>
+  <span class="nav-badge">HTML · CSS · JS</span>
+</nav>
 
+<!-- ════════════════════ HERO -->
+<header id="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-orb orb1"></div>
+  <div class="hero-orb orb2"></div>
+  <div class="hero-orb orb3"></div>
+  <div class="hero-content">
+    <div class="hero-tag">⟨ HTML'nin tüm nimetleri ⟩</div>
+    <h1 class="hero-title">
+      <span class="line-dim">ERBİLENİN</span><br>
+      <span class="line-accent">SİTESİ</span>
+    </h1>
+    <p class="hero-sub">Semantic işaretleme, form elemanları, medya, tablo, canvas, interaktif bileşenler ve daha fazlası — hepsi bir arada, döküldü.</p>
+    <div class="hero-btns">
+      <a href="#typography" class="btn btn-primary">Keşfet ↓</a>
+      <a href="#form-section" class="btn btn-outline">Forma git</a>
+      <button class="btn btn-outline" onclick="document.getElementById('dialogEl').showModal()">Dialog Aç</button>
+    </div>
+  </div>
+</header>
+
+<hr class="divider">
+
+<!-- ════════════════════ TYPOGRAPHY -->
+<section id="typography">
+  <div class="section-label">01 — Tipografi</div>
+  <h2>Metin <span style="color:var(--accent)">Stilleri</span></h2>
+  <div class="grid-2">
+    <div class="card reveal">
+      <div class="type-showcase">
+        <p class="t-h1">Başlık H1</p>
+        <p class="t-h2">Başlık H2 Seviyesi</p>
+        <p class="t-h3">Başlık H3 Seviyesi</p>
+        <p class="t-h4">Başlık H4 — Daha ince</p>
+        <p class="t-lead">Lead paragraph — öne çıkan, daha büyük ve okunması kolay bir giriş cümlesi paragrafı burada yer alır.</p>
+        <p class="t-mono">&lt;code_is_art /&gt;</p>
+        <p class="t-small">KÜÇÜK METİN · UPPERCASE · TRACKED</p>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1.2rem;">
+      <div class="card reveal" style="transition-delay:0.1s">
+        <h3>Satır İçi Elementler</h3>
+        <p style="font-size:0.9rem;line-height:2;color:var(--muted)">
+          <strong>Kalın metin</strong>, <em>İtalik metin</em>, <u>altı çizili</u>, <s>üstü çizili</s>,
+          <mark>işaretlenmiş</mark>, <code>&lt;kod&gt;</code>, <kbd>Ctrl+K</kbd>,
+          <abbr title="HyperText Markup Language">HTML</abbr>,
+          H<sub>2</sub>O ve E=mc<sup>2</sup>.
+        </p>
+      </div>
+      <div class="card reveal" style="transition-delay:0.15s">
+        <h3>Alıntı & Detaylar</h3>
+        <blockquote>"İyi yazılmış HTML, programcının şiiridir." — Anonim Geliştirici</blockquote>
+        <div style="margin-top:1rem">
+          <details>
+            <summary>Semantic HTML nedir?</summary>
+            <p style="margin-top:0.75rem;font-size:0.88rem;color:var(--muted);line-height:1.7">Semantic HTML, içeriğin anlamını ve yapısını tarayıcıya ve geliştiricilere açıkça belirten etiketlerin kullanılmasıdır.</p>
+          </details>
+          <details>
+            <summary>WAI-ARIA ne işe yarar?</summary>
+            <p style="margin-top:0.75rem;font-size:0.88rem;color:var(--muted);line-height:1.7">Erişilebilirlik özelliklerini ekleyerek ekran okuyucuların sayfayı doğru yorumlamasını sağlar.</p>
+          </details>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ════════════════════ FORM -->
+<section id="form-section">
+  <div class="section-label">02 — Form Elemanları</div>
+  <h2>Formun <span style="color:var(--accent)">Tüm</span> Gücü</h2>
+  <form class="card reveal" onsubmit="handleSubmit(event)" novalidate>
+    <fieldset>
+      <legend>KİŞİSEL BİLGİLER</legend>
+      <div class="form-grid" style="margin-top:1rem">
+        <div class="form-group">
+          <label for="isim">Ad Soyad</label>
+          <input type="text" id="isim" name="isim" placeholder="Erbilen..." required autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label for="email">E-posta</label>
+          <input type="email" id="email" name="email" placeholder="erbilen@site.dev" required>
+        </div>
+        <div class="form-group">
+          <label for="sifre">Şifre</label>
+          <input type="password" id="sifre" name="sifre" placeholder="••••••••" minlength="8">
+        </div>
+        <div class="form-group">
+          <label for="tel">Telefon</label>
+          <input type="tel" id="tel" name="tel" placeholder="+90 5xx xxx xx xx">
+        </div>
+        <div class="form-group">
+          <label for="sayi">Yaş</label>
+          <input type="number" id="sayi" name="yas" min="1" max="120" placeholder="25">
+        </div>
+        <div class="form-group">
+          <label for="tarih">Doğum Tarihi</label>
+          <input type="date" id="tarih" name="tarih">
+        </div>
+        <div class="form-group">
+          <label for="website">Web Sitesi</label>
+          <input type="url" id="website" name="website" placeholder="https://erbilen.dev" list="url-suggestions">
+          <datalist id="url-suggestions">
+            <option value="https://erbilen.dev">
+            <option value="https://github.com/erbilen">
+          </datalist>
+        </div>
+        <div class="form-group">
+          <label for="arama">Arama</label>
+          <input type="search" id="arama" name="arama" placeholder="Birşeyler ara...">
+        </div>
+        <div class="form-group">
+          <label for="saat">Saat</label>
+          <input type="time" id="saat" name="saat">
+        </div>
+        <div class="form-group">
+          <label for="ay">Ay</label>
+          <input type="month" id="ay" name="ay">
+        </div>
+        <div class="form-group">
+          <label for="renk">Favori Renk</label>
+          <input type="color" id="renk" name="renk" value="#c8f04a">
+        </div>
+        <div class="form-group">
+          <label for="dosya">Dosya Yükle</label>
+          <input type="file" id="dosya" name="dosya" accept="image/*" style="color:var(--muted);font-size:0.85rem">
+        </div>
+        <div class="form-group full">
+          <label for="biyografi">Biyografi</label>
+          <textarea id="biyografi" name="biyografi" rows="3" placeholder="Kendinizden bahsedin..."></textarea>
+        </div>
+        <div class="form-group full">
+          <label for="sehir">Şehir Seç</label>
+          <select id="sehir" name="sehir">
+            <option value="">-- Seçin --</option>
+            <optgroup label="Marmara">
+              <option value="ist">İstanbul</option>
+              <option value="brs" selected>Bursa</option>
+            </optgroup>
+            <optgroup label="Ege">
+              <option value="izm">İzmir</option>
+              <option value="mug">Muğla</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Seviye</label>
+          <div class="field-row">
+            <input type="range" id="seviye" min="0" max="100" value="72" oninput="document.getElementById('seviye-val').textContent=this.value+'%'">
+            <span id="seviye-val" style="font-family:'JetBrains Mono';color:var(--accent);font-size:0.85rem;min-width:40px">72%</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Cinsiyet</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="cinsiyet" value="e"> Erkek</label>
+            <label class="radio-item"><input type="radio" name="cinsiyet" value="k"> Kadın</label>
+            <label class="radio-item"><input type="radio" name="cinsiyet" value="d"> Diğer</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>İlgi Alanları</label>
+          <div class="check-group">
+            <label class="check-item"><input type="checkbox" name="ilgi" value="html" checked> HTML</label>
+            <label class="check-item"><input type="checkbox" name="ilgi" value="css"> CSS</label>
+            <label class="check-item"><input type="checkbox" name="ilgi" value="js"> JS</label>
+          </div>
+        </div>
+        <div class="form-group full" style="flex-direction:row;align-items:center;gap:10px">
+          <input type="checkbox" id="sozlesme" name="sozlesme" required>
+          <label for="sozlesme" style="text-transform:none;font-size:0.88rem">Kullanım koşullarını <a href="#" style="color:var(--accent)">okudum ve kabul ediyorum</a>.</label>
+        </div>
+      </div>
+    </fieldset>
+    <div style="margin-top:1.5rem;display:flex;gap:1rem;flex-wrap:wrap">
+      <button type="submit" class="btn btn-primary">Gönder →</button>
+      <button type="reset" class="btn btn-outline">Sıfırla</button>
+      <button type="button" class="btn btn-outline" disabled>Devre Dışı</button>
+    </div>
+    <div id="form-result" style="margin-top:1rem;font-family:'JetBrains Mono';font-size:0.8rem;color:var(--accent);display:none"></div>
+  </form>
+
+  <div style="margin-top:2rem" class="grid-2">
+    <div class="card reveal" style="transition-delay:0.1s">
+      <h3>İlerleme Çubukları</h3>
+      <div class="progress-bars" style="margin-top:1rem">
+        <div class="prog-row">
+          <div class="prog-label"><span style="color:var(--muted);font-size:0.8rem">HTML</span><span style="color:var(--accent);font-size:0.8rem;font-family:'JetBrains Mono'">95%</span></div>
+          <div class="prog-track"><div class="prog-fill fill-green" style="width:95%"></div></div>
+        </div>
+        <div class="prog-row">
+          <div class="prog-label"><span style="color:var(--muted);font-size:0.8rem">CSS</span><span style="color:#a888ff;font-size:0.8rem;font-family:'JetBrains Mono'">88%</span></div>
+          <div class="prog-track"><div class="prog-fill fill-purple" style="width:88%"></div></div>
+        </div>
+        <div class="prog-row">
+          <div class="prog-label"><span style="color:var(--muted);font-size:0.8rem">JavaScript</span><span style="color:var(--accent3);font-size:0.8rem;font-family:'JetBrains Mono'">76%</span></div>
+          <div class="prog-track"><div class="prog-fill fill-pink" style="width:76%"></div></div>
+        </div>
+        <div style="margin-top:0.5rem">
+          <label style="display:block;margin-bottom:4px">Progress natif:</label>
+          <progress value="65" max="100"></progress>
+        </div>
+        <div>
+          <label style="display:block;margin-bottom:4px">Meter natif:</label>
+          <meter value="0.7" low="0.3" high="0.8" optimum="0.9"></meter>
+        </div>
+      </div>
+    </div>
+    <div class="card reveal" style="transition-delay:0.15s">
+      <h3>Output Elementi</h3>
+      <p style="font-size:0.88rem;color:var(--muted);margin-bottom:1rem">İki sayıyı çarp, sonucu output ile göster:</p>
+      <form oninput="sonuc.value=parseInt(a.value)*parseInt(b.value)">
+        <div class="field-row" style="flex-wrap:wrap;gap:0.75rem">
+          <div class="form-group" style="flex:1;min-width:80px">
+            <label for="a">A</label>
+            <input type="number" id="a" name="a" value="6" min="0">
+          </div>
+          <span style="font-size:1.5rem;color:var(--muted);align-self:flex-end;padding-bottom:0.6rem">×</span>
+          <div class="form-group" style="flex:1;min-width:80px">
+            <label for="b">B</label>
+            <input type="number" id="b" name="b" value="7" min="0">
+          </div>
+          <span style="font-size:1.5rem;color:var(--muted);align-self:flex-end;padding-bottom:0.6rem">=</span>
+          <div style="align-self:flex-end;padding-bottom:0.3rem">
+            <output name="sonuc" for="a b" style="font-family:'Bebas Neue';font-size:2.5rem;color:var(--accent)">42</output>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ════════════════════ TABLE -->
+<section id="table-section">
+  <div class="section-label">03 — Tablo</div>
+  <h2>Veri <span style="color:var(--accent)">Tablosu</span></h2>
+  <div class="table-wrap reveal">
+    <table>
+      <caption style="padding:1rem;font-family:'JetBrains Mono';font-size:0.75rem;color:var(--muted);text-align:left;border-bottom:1px solid var(--border)">
+        Tablo 1: HTML Elementleri Karşılaştırması
+      </caption>
+      <colgroup>
+        <col style="width:20%">
+        <col style="width:30%">
+        <col style="width:15%">
+        <col style="width:20%">
+        <col style="width:15%">
+      </colgroup>
+      <thead>
+        <tr>
+          <th scope="col">Element</th>
+          <th scope="col">Açıklama</th>
+          <th scope="col">Tip</th>
+          <th scope="col">Destek</th>
+          <th scope="col">Durum</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>&lt;canvas&gt;</code></td>
+          <td>2D/3D çizim alanı</td>
+          <td>Medya</td>
+          <td>HTML5+</td>
+          <td><span class="badge badge-green">Aktif</span></td>
+        </tr>
+        <tr>
+          <td><code>&lt;dialog&gt;</code></td>
+          <td>Native modal pencere</td>
+          <td>İnteraktif</td>
+          <td>Modern</td>
+          <td><span class="badge badge-green">Aktif</span></td>
+        </tr>
+        <tr>
+          <td><code>&lt;details&gt;</code></td>
+          <td>Açılır/kapanır içerik</td>
+          <td>Yapı</td>
+          <td>HTML5+</td>
+          <td><span class="badge badge-purple">Beta</span></td>
+        </tr>
+        <tr>
+          <td><code>&lt;template&gt;</code></td>
+          <td>JS ile klonlanacak şablon</td>
+          <td>Script</td>
+          <td>Modern</td>
+          <td><span class="badge badge-green">Aktif</span></td>
+        </tr>
+        <tr>
+          <td><code>&lt;bdo&gt;</code></td>
+          <td>Metin yönünü değiştir</td>
+          <td>Metin</td>
+          <td>HTML4+</td>
+          <td><span class="badge badge-muted">Nadir</span></td>
+        </tr>
+        <tr>
+          <td><code>&lt;marquee&gt;</code></td>
+          <td>Kayan metin</td>
+          <td>Sunum</td>
+          <td>Eski</td>
+          <td><span class="badge badge-red">Deprecated</span></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="5" style="font-size:0.78rem;color:var(--muted);font-family:'JetBrains Mono'">
+            * Modern tarayıcılar HTML5 elementlerinin tamamını destekler.
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ════════════════════ MEDIA -->
+<section id="media-section">
+  <div class="section-label">04 — Medya</div>
+  <h2>Canvas, SVG & <span style="color:var(--accent)">Medya</span></h2>
+  <div class="grid-2">
+    <div class="reveal">
+      <h3>Canvas — Canlı Partikül Animasyonu</h3>
+      <div class="canvas-wrap" style="margin-top:0.75rem">
+        <canvas id="myCanvas" width="640" height="260"></canvas>
+      </div>
+    </div>
+    <div class="reveal" style="transition-delay:0.1s">
+      <h3>SVG — İnline Vektör Grafik</h3>
+      <div class="card svg-showcase" style="margin-top:0.75rem;justify-content:center">
+        <figure>
+          <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-label="Dönen renkli halka diyagramı">
+            <defs>
+              <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#c8f04a"/>
+                <stop offset="100%" stop-color="#7b4fff"/>
+              </linearGradient>
+              <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ff4f7b"/>
+                <stop offset="100%" stop-color="#7b4fff"/>
+              </linearGradient>
+            </defs>
+            <circle cx="100" cy="100" r="80" fill="none" stroke="url(#g1)" stroke-width="12" stroke-dasharray="400 502" stroke-linecap="round">
+              <animateTransform attributeName="transform" type="rotate" from="0 100 100" to="360 100 100" dur="3s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="100" cy="100" r="58" fill="none" stroke="url(#g2)" stroke-width="8" stroke-dasharray="250 364" stroke-linecap="round">
+              <animateTransform attributeName="transform" type="rotate" from="360 100 100" to="0 100 100" dur="2s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="100" cy="100" r="36" fill="none" stroke="#c8f04a" stroke-width="4" opacity="0.4" stroke-dasharray="120 226">
+              <animateTransform attributeName="transform" type="rotate" from="0 100 100" to="360 100 100" dur="1.2s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="100" cy="100" r="18" fill="rgba(200,240,74,0.1)" stroke="rgba(200,240,74,0.4)" stroke-width="1"/>
+            <text x="100" y="105" text-anchor="middle" fill="#c8f04a" font-family="'Bebas Neue'" font-size="14">SVG</text>
+          </svg>
+          <figcaption>Animasyonlu SVG Halka</figcaption>
+        </figure>
+        <figure>
+          <svg width="160" height="160" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="10" width="60" height="60" rx="8" fill="rgba(200,240,74,0.1)" stroke="#c8f04a" stroke-width="1">
+              <animate attributeName="x" values="10;90;10" dur="4s" repeatCount="indefinite"/>
+              <animate attributeName="y" values="10;90;10" dur="3s" repeatCount="indefinite"/>
+            </rect>
+            <polygon points="80,10 150,80 80,150 10,80" fill="none" stroke="rgba(123,79,255,0.5)" stroke-width="1">
+              <animateTransform attributeName="transform" type="rotate" from="0 80 80" to="360 80 80" dur="6s" repeatCount="indefinite"/>
+            </polygon>
+            <circle cx="80" cy="80" r="20" fill="rgba(255,79,123,0.15)" stroke="#ff4f7b" stroke-width="1">
+              <animate attributeName="r" values="20;35;20" dur="2s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+          <figcaption>Geometrik Animasyon</figcaption>
+        </figure>
+      </div>
+    </div>
+    <div class="reveal" style="transition-delay:0.15s">
+      <h3>Audio Elementi</h3>
+      <div class="card" style="margin-top:0.75rem">
+        <audio controls style="width:100%">
+          <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.wav" type="audio/wav">
+          <p style="color:var(--muted);font-size:0.85rem">Tarayıcınız audio elementini desteklemiyor.</p>
+        </audio>
+        <p class="input-note" style="margin-top:0.75rem">HTML5 native <code>&lt;audio&gt;</code> kontrolü</p>
+      </div>
+    </div>
+    <div class="reveal" style="transition-delay:0.2s">
+      <h3>Picture & Image</h3>
+      <div class="card" style="margin-top:0.75rem">
+        <picture>
+          <source media="(max-width: 600px)" srcset="https://picsum.photos/seed/erbilen/400/200">
+          <img src="https://picsum.photos/seed/erbilen/640/240" alt="Rastgele doğa fotoğrafı" style="width:100%;border-radius:8px;object-fit:cover">
+        </picture>
+        <p class="input-note" style="margin-top:0.75rem"><code>&lt;picture&gt;</code> + <code>&lt;source&gt;</code> + <code>&lt;img&gt;</code> responsive image</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:2rem" class="reveal">
+    <h3>Map & Area — İnteraktif Görsel Harita</h3>
+    <div class="card" style="position:relative;display:inline-block;overflow:hidden">
+      <img id="map-img" src="https://picsum.photos/seed/map42/640/200" alt="İnteraktif harita örneği" usemap="#harita-map" style="border-radius:8px;display:block;max-width:100%">
+      <map name="harita-map">
+        <area shape="rect" coords="0,0,213,200" href="#" alt="Sol Bölge" onclick="showMapInfo('Sol bölgeye tıkladın! 🌲', event); return false;">
+        <area shape="rect" coords="213,0,426,200" href="#" alt="Orta Bölge" onclick="showMapInfo('Orta bölgeye tıkladın! 🏔️', event); return false;">
+        <area shape="rect" coords="426,0,640,200" href="#" alt="Sağ Bölge" onclick="showMapInfo('Sağ bölgeye tıkladın! 🌊', event); return false;">
+      </map>
+      <div id="map-tooltip" style="display:none;position:absolute;background:var(--bg2);border:1px solid var(--accent);padding:6px 12px;border-radius:6px;font-family:'JetBrains Mono';font-size:0.78rem;color:var(--accent);pointer-events:none"></div>
+    </div>
+    <p class="input-note" style="margin-top:0.5rem">3 ayrı bölgeye tıkla — <code>&lt;map&gt;</code> + <code>&lt;area&gt;</code> ile yapıldı</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ════════════════════ SEMANTIC -->
+<section id="semantic-section">
+  <div class="section-label">05 — Semantik HTML</div>
+  <h2>Anlam <span style="color:var(--accent)">Taşıyan</span> Yapı</h2>
+  <div class="grid-2">
+    <div class="reveal">
+      <article>
+        <header>
+          <div class="badge badge-purple" style="margin-bottom:0.5rem">MAKALE</div>
+          <h3>Semantic HTML'nin Önemi</h3>
+          <time datetime="2025-05-28">28 Mayıs 2025</time>
+        </header>
+        <p style="margin-top:0.75rem;font-size:0.88rem;color:var(--muted);line-height:1.7">Semantic HTML, arama motorlarının ve ekran okuyucularının içeriği doğru anlamasını sağlar. <mark>SEO</mark> skoru artar, erişilebilirlik iyileşir.</p>
+        <footer>
+          <address>Yazar: <a href="mailto:erbilen@site.dev" style="color:var(--accent)">Erbilen</a></address>
+        </footer>
+      </article>
+    </div>
+    <div class="reveal" style="transition-delay:0.1s">
+      <aside>
+        <div class="badge badge-purple" style="margin-bottom:0.75rem">ASIDE</div>
+        <h3>Bağlantılı İçerik</h3>
+        <p style="font-size:0.88rem;color:var(--muted);line-height:1.7">Aside elementi, ana içerikle dolaylı ilişkili ek bilgileri barındırır. Sidebar, quote box veya reklam alanı olarak kullanılır.</p>
+        <dl class="definition-list" style="margin-top:1rem">
+          <dt>HTML</dt>
+          <dd>HyperText Markup Language — web'in iskeleti</dd>
+          <dt>CSS</dt>
+          <dd>Cascading Style Sheets — web'in cildi</dd>
+          <dt>JS</dt>
+          <dd>JavaScript — web'in kasları</dd>
+        </dl>
+      </aside>
+    </div>
+    <div class="card reveal" style="transition-delay:0.15s">
+      <h3>Liste Türleri</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1rem">
+        <div>
+          <p style="font-size:0.75rem;color:var(--muted);font-family:'JetBrains Mono';margin-bottom:0.75rem">SIRALANMIŞ (&lt;ol&gt;)</p>
+          <ol class="fancy-ol">
+            <li>HTML öğren</li>
+            <li>CSS ustal</li>
+            <li>JS hâkim ol</li>
+            <li>Deploy et</li>
+          </ol>
+        </div>
+        <div>
+          <p style="font-size:0.75rem;color:var(--muted);font-family:'JetBrains Mono';margin-bottom:0.75rem">SIRALANMAMIŞ (&lt;ul&gt;)</p>
+          <ul class="fancy-ul">
+            <li>Semantic elementler</li>
+            <li>Accessibility</li>
+            <li>Performance</li>
+            <li>SEO dostu yapı</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="card reveal" style="transition-delay:0.2s">
+      <h3>BDO & Özel Elementler</h3>
+      <div style="display:flex;flex-direction:column;gap:0.75rem;margin-top:0.75rem">
+        <p style="font-size:0.88rem;color:var(--muted)"><strong style="color:var(--text)">bdo RTL:</strong> <bdo dir="rtl" style="color:var(--accent)">Erbilen'in Sitesi</bdo></p>
+        <p style="font-size:0.88rem;color:var(--muted)"><strong style="color:var(--text)">ruby:</strong> <ruby style="color:var(--text)">漢字<rt style="color:var(--accent);font-size:0.7em">Kanji</rt></ruby></p>
+        <p style="font-size:0.88rem;color:var(--muted)"><strong style="color:var(--text)">var:</strong> <var style="color:#a888ff;font-style:italic">x = y² + 2z</var></p>
+        <p style="font-size:0.88rem;color:var(--muted)"><strong style="color:var(--text)">samp:</strong> <samp style="font-family:'JetBrains Mono';color:var(--accent3)">Error: 404 Not Found</samp></p>
+        <p style="font-size:0.88rem;color:var(--muted)"><strong style="color:var(--text)">data:</strong> <data value="7" style="color:var(--accent)">Yedi</data></p>
+        <p style="font-size:0.88rem;color:var(--muted)"><strong style="color:var(--text)">wbr:</strong> Bu<wbr>çok<wbr>uzun<wbr>bir<wbr>kelimedir</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ════════════════════ INTERACTIVE -->
+<section id="interactive-section">
+  <div class="section-label">06 — İnteraktif</div>
+  <h2>Etkileşimli <span style="color:var(--accent)">Bileşenler</span></h2>
+  <div class="grid-3">
+    <div class="card reveal">
+      <h3>Sayaç</h3>
+      <div class="counter-box" style="margin-top:1rem">
+        <button class="btn btn-outline" onclick="changeCount(-1)" style="font-size:1.2rem;padding:0.5rem 1rem">−</button>
+        <div class="counter-val" id="count-display">0</div>
+        <button class="btn btn-primary" onclick="changeCount(1)" style="font-size:1.2rem;padding:0.5rem 1rem">+</button>
+      </div>
+      <button class="btn btn-outline" onclick="changeCount(-document.getElementById('count-display').textContent)" style="width:100%;margin-top:1rem;font-size:0.75rem">Sıfırla</button>
+    </div>
+    <div class="card reveal" style="transition-delay:0.1s">
+      <h3>Tooltip Örnekleri</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:1rem">
+        <div class="tooltip-wrap">
+          <button class="btn btn-primary">Hov Bana</button>
+          <span class="tooltip">✨ HTML tooltip!</span>
+        </div>
+        <div class="tooltip-wrap">
+          <button class="btn btn-purple">Bilgi</button>
+          <span class="tooltip">CSS only, JS yok!</span>
+        </div>
+        <div class="tooltip-wrap">
+          <button class="btn btn-danger">Dikkat</button>
+          <span class="tooltip">⚠️ Tehlikeli alan</span>
+        </div>
+      </div>
+      <div style="margin-top:1.5rem">
+        <h3 style="margin-bottom:0.75rem">Dialog</h3>
+        <button class="btn btn-outline" onclick="document.getElementById('dialogEl').showModal()">Native Dialog Aç</button>
+      </div>
+    </div>
+    <div class="card reveal" style="transition-delay:0.2s">
+      <h3>Tema Değiştir</h3>
+      <div style="display:flex;flex-direction:column;gap:0.75rem;margin-top:1rem">
+        <button class="btn btn-primary" onclick="changeAccent('#c8f04a')">🟢 Limon</button>
+        <button class="btn btn-purple" onclick="changeAccent('#7b4fff')">🟣 Mor</button>
+        <button class="btn btn-danger" onclick="changeAccent('#ff4f7b')">🔴 Pembe</button>
+        <button class="btn btn-outline" onclick="changeAccent('#00d4ff')">🔵 Cyan</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:2rem" class="grid-2">
+    <div class="card reveal">
+      <h3>Tab Bileşeni</h3>
+      <div class="tabs-wrap" style="margin-top:1rem">
+        <div class="tab-btns">
+          <button class="tab-btn active" onclick="openTab('t1', this)">HTML</button>
+          <button class="tab-btn" onclick="openTab('t2', this)">CSS</button>
+          <button class="tab-btn" onclick="openTab('t3', this)">JavaScript</button>
+        </div>
+        <div id="t1" class="tab-content active">
+          <p style="font-size:0.88rem;color:var(--muted);line-height:1.7">HTML, web sayfalarının yapısını tanımlar. Semantic elementler ile içeriğin anlamını net şekilde ortaya koyar.</p>
+        </div>
+        <div id="t2" class="tab-content">
+          <p style="font-size:0.88rem;color:var(--muted);line-height:1.7">CSS, HTML elementlerinin görünümünü ve düzenini kontrol eder. Grid, Flexbox ve animasyonlar ile zengin UI mümkün.</p>
+        </div>
+        <div id="t3" class="tab-content">
+          <p style="font-size:0.88rem;color:var(--muted);line-height:1.7">JavaScript, sayfaya dinamizm katar. DOM manipülasyonu, event handling ve async işlemler ile interaktif deneyimler yaratır.</p>
+        </div>
+      </div>
+    </div>
+    <div class="card reveal" style="transition-delay:0.1s">
+      <h3>Accordion Bileşeni</h3>
+      <div class="accordion" style="margin-top:1rem">
+        <div class="acc-item">
+          <button class="acc-btn" onclick="toggleAcc(this)">
+            Canvas nedir? <span class="acc-arrow">▾</span>
+          </button>
+          <div class="acc-panel">HTML5 ile gelen canvas, JavaScript kullanarak 2D ve WebGL ile 3D grafikler çizmeni sağlayan bir bitmap alanıdır.</div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-btn" onclick="toggleAcc(this)">
+            SVG vs Canvas <span class="acc-arrow">▾</span>
+          </button>
+          <div class="acc-panel">SVG vektörel (ölçeklenebilir, DOM'da), Canvas raster (piksel tabanlı, performanslı). Her ikisi farklı senaryolar için uygundur.</div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-btn" onclick="toggleAcc(this)">
+            Web Components <span class="acc-arrow">▾</span>
+          </button>
+          <div class="acc-panel">Custom Elements, Shadow DOM ve HTML Templates ile yeniden kullanılabilir, kapsüllenmiş bileşenler oluşturulabilir.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap" class="reveal">
+    <div class="card" style="flex:1;min-width:200px">
+      <h3>Template Klonla</h3>
+      <template id="card-template">
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:1rem;margin-top:0.5rem;font-size:0.85rem;color:var(--accent);font-family:'JetBrains Mono'">
+          🎴 Klonlanan kart #<span class="clone-num"></span>
+        </div>
+      </template>
+      <div id="clone-container"></div>
+      <button class="btn btn-outline" onclick="cloneTemplate()" style="margin-top:1rem;width:100%;font-size:0.78rem">Kart Klonla</button>
+    </div>
+    <div class="card" style="flex:1;min-width:200px">
+      <h3>Klavye Olayları</h3>
+      <input type="text" id="key-input" placeholder="Bir tuşa bas..." oninput="showKey(event)" onkeydown="showKey(event)" style="margin-top:0.5rem">
+      <div id="key-output" style="margin-top:0.75rem;font-family:'JetBrains Mono';font-size:0.8rem;color:var(--muted);min-height:40px"></div>
+    </div>
+    <div class="card" style="flex:1;min-width:200px">
+      <h3>Sürükle & Bırak</h3>
+      <div id="drag-src" draggable="true" ondragstart="dragStart(event)" style="background:rgba(200,240,74,0.1);border:1px dashed var(--accent);border-radius:8px;padding:1rem;text-align:center;font-size:0.85rem;color:var(--accent);cursor:grab;margin-top:0.5rem">
+        Beni sürükle!
+      </div>
+      <div id="drag-target" ondragover="event.preventDefault()" ondrop="dropHere(event)" style="background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.15);border-radius:8px;padding:1rem;text-align:center;font-size:0.85rem;color:var(--muted);min-height:60px;margin-top:0.75rem;display:flex;align-items:center;justify-content:center">
+        Buraya bırak →
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ════════════════════ STATS -->
+<section id="stats-section">
+  <div class="section-label">07 — İstatistikler</div>
+  <h2>HTML'nin <span style="color:var(--accent)">Rakamları</span></h2>
+  <div class="grid-4">
+    <div class="stat-card reveal">
+      <div class="stat-num">140+</div>
+      <div class="stat-label">HTML ELEMENTİ</div>
+      <div class="stat-desc">HTML5 ile birlikte gelen tüm native elementler</div>
+    </div>
+    <div class="stat-card reveal" style="transition-delay:0.08s">
+      <div class="stat-num">1993</div>
+      <div class="stat-label">DOĞUM YILI</div>
+      <div class="stat-desc">Tim Berners-Lee'nin HTML'yi tanıttığı yıl</div>
+    </div>
+    <div class="stat-card reveal" style="transition-delay:0.16s">
+      <div class="stat-num">5.4B</div>
+      <div class="stat-label">KULLANICI</div>
+      <div class="stat-desc">Dünya genelinde internet kullanan insan sayısı</div>
+    </div>
+    <div class="stat-card reveal" style="transition-delay:0.24s">
+      <div class="stat-num">98%</div>
+      <div class="stat-label">WEB SİTELERİ</div>
+      <div class="stat-desc">HTML kullanan web sitelerinin oranı</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ DIALOG -->
+<dialog id="dialogEl">
+  <h3>🚀 Native Dialog</h3>
+  <p style="color:var(--muted);font-size:0.9rem;line-height:1.7;margin-bottom:1.5rem">Bu, HTML5'in <code>&lt;dialog&gt;</code> elementi! JavaScript ile <code>.showModal()</code> çağrısıyla açılır. Native backdrop desteği var.</p>
+  <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
+    <button class="btn btn-primary" onclick="document.getElementById('dialogEl').close()">Kapat ✓</button>
+    <button class="btn btn-outline" onclick="document.getElementById('dialogEl').close()">Vazgeç</button>
+  </div>
+</dialog>
+
+<!-- ════════════════════ FOOTER -->
+<footer>
+  <div class="footer-logo">ERBİLEN</div>
+  <p>HTML'nin her nimetinden faydalanılan <strong>Erbilenin Sitesi</strong><br>
+  Tipografi · Form · Tablo · Canvas · SVG · Medya · Semantic · İnteraktif</p>
+  <p style="margin-top:1rem;font-family:'JetBrains Mono';font-size:0.72rem;color:rgba(136,136,153,0.5)">
+    &lt;html&gt; &lt;head&gt; &lt;body&gt; &lt;main&gt; &lt;section&gt; &lt;article&gt; &lt;aside&gt; &lt;footer&gt; &lt;/footer&gt;
+  </p>
+</footer>
+
+<script>
+/* ── CURSOR ── */
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+});
+document.querySelectorAll('a,button,input,select,textarea,details,summary,[draggable]').forEach(el => {
+  el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+  el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+});
+
+/* ── SCROLL REVEAL ── */
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+reveals.forEach(r => observer.observe(r));
+
+/* ── CANVAS PARTICLES ── */
+const canvas = document.getElementById('myCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = canvas.offsetWidth || 640;
+canvas.height = 260;
+
+const particles = [];
+for(let i = 0; i < 80; i++) {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 2.5 + 0.5,
+    vx: (Math.random() - 0.5) * 1.2,
+    vy: (Math.random() - 0.5) * 1.2,
+    alpha: Math.random() * 0.6 + 0.2,
+    hue: Math.random() > 0.5 ? '#c8f04a' : Math.random() > 0.5 ? '#7b4fff' : '#ff4f7b'
+  });
+}
+
+let mouseX = canvas.width / 2, mouseY = canvas.height / 2;
+canvas.addEventListener('mousemove', e => {
+  const rect = canvas.getBoundingClientRect();
+  mouseX = e.clientX - rect.left;
+  mouseY = e.clientY - rect.top;
+});
+
+function animCanvas() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#080810';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  particles.forEach((p, i) => {
+    p.x += p.vx; p.y += p.vy;
+    if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
+    if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+    const dx = mouseX - p.x, dy = mouseY - p.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if(dist < 80) { p.vx -= dx/dist * 0.3; p.vy -= dy/dist * 0.3; }
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = p.hue;
+    ctx.globalAlpha = p.alpha;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    particles.slice(i+1).forEach(p2 => {
+      const dx2 = p.x - p2.x, dy2 = p.y - p2.y;
+      const d = Math.sqrt(dx2*dx2 + dy2*dy2);
+      if(d < 90) {
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.strokeStyle = '#c8f04a';
+        ctx.globalAlpha = (1 - d/90) * 0.25;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+    });
+  });
+  requestAnimationFrame(animCanvas);
+}
+animCanvas();
+
+/* ── COUNTER ── */
+let count = 0;
+function changeCount(n) {
+  count = Math.max(-999, Math.min(999, count + Number(n)));
+  document.getElementById('count-display').textContent = count;
+}
+
+/* ── TABS ── */
+function openTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ── ACCORDION ── */
+function toggleAcc(btn) {
+  const panel = btn.nextElementSibling;
+  const isOpen = panel.classList.contains('open');
+  document.querySelectorAll('.acc-panel').forEach(p => p.classList.remove('open'));
+  if(!isOpen) panel.classList.add('open');
+}
+
+/* ── FORM SUBMIT ── */
+function handleSubmit(e) {
+  e.preventDefault();
+  const res = document.getElementById('form-result');
+  res.style.display = 'block';
+  res.textContent = '✓ Form başarıyla gönderildi! (Bu bir simülasyondur.)';
+}
+
+/* ── TEMPLATE CLONE ── */
+let cloneCount = 0;
+function cloneTemplate() {
+  if(cloneCount >= 5) { document.getElementById('clone-container').innerHTML = ''; cloneCount = 0; }
+  const template = document.getElementById('card-template');
+  const clone = template.content.cloneNode(true);
+  clone.querySelector('.clone-num').textContent = ++cloneCount;
+  document.getElementById('clone-container').appendChild(clone);
+}
+
+/* ── KEY EVENTS ── */
+function showKey(e) {
+  const out = document.getElementById('key-output');
+  if(e.key) {
+    out.innerHTML = `Tuş: <span style="color:var(--accent)">${e.key}</span> | Kod: <span style="color:var(--accent2)">${e.code}</span>`;
+  }
+}
+
+/* ── DRAG DROP ── */
+function dragStart(e) { e.dataTransfer.setData('text', 'dragged'); }
+function dropHere(e) {
+  e.preventDefault();
+  const target = document.getElementById('drag-target');
+  target.style.borderColor = 'var(--accent)';
+  target.style.color = 'var(--accent)';
+  target.textContent = '🎯 Başarıyla bırakıldı!';
+  setTimeout(() => {
+    target.style.borderColor = ''; target.style.color = '';
+    target.textContent = 'Buraya bırak →';
+  }, 2000);
+}
+
+/* ── MAP ── */
+function showMapInfo(msg, e) {
+  const tip = document.getElementById('map-tooltip');
+  const rect = document.getElementById('map-img').getBoundingClientRect();
+  const containerRect = e.target.closest('.card').getBoundingClientRect();
+  tip.textContent = msg;
+  tip.style.display = 'block';
+  tip.style.left = (e.clientX - containerRect.left + 10) + 'px';
+  tip.style.top = (e.clientY - containerRect.top - 40) + 'px';
+  setTimeout(() => tip.style.display = 'none', 2500);
+}
+
+/* ── THEME ── */
+function changeAccent(color) {
+  document.documentElement.style.setProperty('--accent', color);
+}
+</script>
 </body>
 </html>
